@@ -3,9 +3,12 @@ project(MyworldGame)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 find_package(OGRE REQUIRED COMPONENTS Bites CONFIG)
+set(SOURCES
+	src/main.cpp
+	
+)
 include_directories(${CMAKE_SOURCE_DIR}/include)
-add_executable(MyworldGame src/*.cpp)
+add_executable(MyworldGame ${SOURCES})
 
 target_link_libraries(MyworldGame OgreBites)

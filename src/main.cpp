@@ -65,7 +65,7 @@ void BasicTutorial1::setup()
     Entity* ogreEntity = scnMgr->createEntity("ogrehead.mesh");
  
     SceneNode* ogreNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-]
+
     ogreNode->attachObject(ogreEntity);
 
     camNode->setPosition(0, 47, 222);
