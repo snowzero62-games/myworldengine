@@ -8,4 +8,4 @@ find_package(OGRE REQUIRED COMPONENTS Bites CONFIG)
 
 add_executable(MyworldGame src/main.cpp)  # or wherever your main.cpp is
 
-target_link_libraries(MyworldGame OGRE::Bites)
+target_link_libraries(MyworldGame OgreBites)
