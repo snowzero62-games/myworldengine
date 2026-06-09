@@ -1,117 +1,61 @@
-#include "Ogre.h"
-#include "OgreApplicationContext.h"
-#include "OgreInput.h"
-#include "OgreRTShaderSystem.h"
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include "glad/glad.h"
 #include <iostream>
 
-using namespace Ogre;
-using namespace OgreBites;
-
-class BasicTutorial1
-        : public ApplicationContext
-        , public InputListener
+void error_callback(int error, const char* description)
 {
-public:
-    BasicTutorial1();
-    virtual ~BasicTutorial1() {}
-
-    void setup();
-    bool keyPressed(const KeyboardEvent& evt);
-};
-
-
-BasicTutorial1::BasicTutorial1()
-    : ApplicationContext("OgreTutorialApp")
-{
+    fprintf(stderr, "Error: %s\n", description);
 }
 
-
-void BasicTutorial1::setup()
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    // do not forget to call the base first
-    ApplicationContext::setup();
-    addInputListener(this);
-
-    // get a pointer to the already created root
-    Root* root = getRoot();
-    SceneManager* scnMgr = root->createSceneManager();
-
-    // register our scene with the RTSS
-    RTShader::ShaderGenerator* shadergen = RTShader::ShaderGenerator::getSingletonPtr();
-    shadergen->addSceneManager(scnMgr);
-
-    // -- tutorial section start --
-    //! [turnlights]
-    scnMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-    //! [turnlights]
-
-    //! [newlight]
-    Light* light = scnMgr->createLight("MainLight");
-    SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-    lightNode->attachObject(light);
-
-    lightNode->setPosition(20, 80, 50);
-
-    SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-
-    Camera* cam = scnMgr->createCamera("myCam");
-    cam->setNearClipDistance(5); 
-    cam->setAutoAspectRatio(true);
-    camNode->attachObject(cam);
-    camNode->setPosition(0, 0, 140);
-
-    getRenderWindow()->addViewport(cam);
-
-    Entity* ogreEntity = scnMgr->createEntity("ogrehead.mesh");
- 
-    SceneNode* ogreNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-
-    ogreNode->attachObject(ogreEntity);
-
-    camNode->setPosition(0, 47, 222);
-    
-    Entity* ogreEntity2 = scnMgr->createEntity("ogrehead.mesh");
-    SceneNode* ogreNode2 = scnMgr->getRootSceneNode()->createChildSceneNode(Vector3(84, 48, 0));
-    ogreNode2->attachObject(ogreEntity2);
-    
-    Entity* ogreEntity3 = scnMgr->createEntity("ogrehead.mesh");
-    SceneNode* ogreNode3 = scnMgr->getRootSceneNode()->createChildSceneNode();
-    ogreNode3->setPosition(0, 104, 0);
-    ogreNode3->setScale(2, 1.2, 1);
-    ogreNode3->attachObject(ogreEntity3);
-    
-    Entity* ogreEntity4 = scnMgr->createEntity("ogrehead.mesh");
-    SceneNode* ogreNode4 = scnMgr->getRootSceneNode()->createChildSceneNode();
-    ogreNode4->setPosition(-84, 48, 0);
-    ogreNode4->roll(Degree(-90));
-    ogreNode4->attachObject(ogreEntity4);
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-
-bool BasicTutorial1::keyPressed(const KeyboardEvent& evt)
+int main(void)
 {
-    if (evt.keysym.sym == SDLK_ESCAPE)
+    if (!glfwInit())
     {
-        getRoot()->queueEndRendering();
-    }
-    return true;
-}
-
-
-int main(int argc, char **argv)
-{
-    try
-    {
-    	BasicTutorial1 app;
-        app.initApp();
-        app.getRoot()->startRendering();
-        app.closeApp();
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Error occurred during execution: " << e.what() << '\n';
-        return 1;
+        std::cout << "Initialization failed" << std::endl;
+        return -1;
     }
 
+    glfwSetErrorCallback(error_callback);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    
+    GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+    if (!window)
+    {
+        std::cout << "Window or context creation failed" << std::endl;
+        glfwTerminate(); 
+        return -1;
+    }
+
+    glfwMakeContextCurrent(window);
+    
+    if (!gladLoadGL())
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    glfwSetKeyCallback(window, key_callback);
+
+    while (!glfwWindowShouldClose(window))
+    {
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        glfwPollEvents();
+        glfwSwapBuffers(window);
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
     return 0;
 }
